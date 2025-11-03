@@ -110,5 +110,22 @@ public class CommunityCharacterRestController {
         return objectMapper.convertValue(communityCharacterNode, CommunityCharacter.class);
     }
 
+    //add mapping for Delete /communityCharacters/{communityCharacterId} - delete communityCharacter
+
+    @DeleteMapping("/communityCharacters/{communityCharacterId}")
+    public String deleteCommunityCharacter(@PathVariable int communityCharacterId) {
+        CommunityCharacter tempCommunityCharacter = communityCharacterService.findById(communityCharacterId);
+
+        //throw exception if null
+        if (tempCommunityCharacter == null)
+        {
+            throw new RuntimeException("Community Character Id not Found!: "+tempCommunityCharacter);
+        }
+
+        communityCharacterService.deleteById(communityCharacterId);
+
+        return "Deleted community Character Id: "+communityCharacterId;
+    }
+
 
 }
