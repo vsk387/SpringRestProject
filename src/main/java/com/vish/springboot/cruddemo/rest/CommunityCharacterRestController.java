@@ -1,6 +1,7 @@
 package com.vish.springboot.cruddemo.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vish.springboot.cruddemo.dao.CommunityCharacterDAO;
 import com.vish.springboot.cruddemo.entity.CommunityCharacter;
 import com.vish.springboot.cruddemo.service.CommunityCharacterService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -66,6 +68,46 @@ public class CommunityCharacterRestController {
         CommunityCharacter dbCommunityCharacter= communityCharacterService.save(theCommunityCharacter);
 
         return dbCommunityCharacter;
+    }
+
+    //add Mapping for PATCH /communityCharacters/{characterId}- patch character... partial update
+    @PatchMapping("/communityCharacters/{communityCharacterId}")
+    public CommunityCharacter patchCommunityCharacter(@PathVariable int communityCharacterId,
+                              @RequestBody Map<String, Object> patchPayLoad)
+    {
+        CommunityCharacter tempCommunityCharacter= communityCharacterService.findById(communityCharacterId);
+
+        //throw exception if null
+        if(tempCommunityCharacter== null)
+        {
+            throw new RuntimeException("Community Character Id not Found!: " +communityCharacterId);
+        }
+
+        if(patchPayLoad.containsKey("id"))
+        {
+            throw new RuntimeException("Community Character Id not allowed in request body!!! "+communityCharacterId);
+        }
+
+        CommunityCharacter patchedCommunityCharacter= apply(patchPayLoad, tempCommunityCharacter);
+
+        CommunityCharacter dbCommunityCharacter= communityCharacterService.save(patchedCommunityCharacter);
+
+        return dbCommunityCharacter;
+    }
+
+    private CommunityCharacter apply(Map<String, Object> patchPayLoad, CommunityCharacter tempCommunityCharacter)
+    {
+        //convert CommunityCharacter object to a JSON object node
+
+        ObjectNode communityCharacterNode= objectMapper.convertValue(tempCommunityCharacter, ObjectNode.class);
+
+        //Convert the patchPayload map to a JSON object node
+        ObjectNode patchNode= objectMapper.convertValue(patchPayLoad, ObjectNode.class);
+
+        //Merge the patch updates into the communityCharacter Node
+        communityCharacterNode.setAll(patchNode);
+
+        return objectMapper.convertValue(communityCharacterNode, CommunityCharacter.class);
     }
 
 
