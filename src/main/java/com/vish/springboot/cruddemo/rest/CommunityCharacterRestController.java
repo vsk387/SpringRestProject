@@ -1,5 +1,6 @@
 package com.vish.springboot.cruddemo.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vish.springboot.cruddemo.dao.CommunityCharacterDAO;
 import com.vish.springboot.cruddemo.entity.CommunityCharacter;
 import com.vish.springboot.cruddemo.service.CommunityCharacterService;
@@ -14,11 +15,13 @@ import java.util.List;
 public class CommunityCharacterRestController {
 
     private CommunityCharacterService communityCharacterService;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    public CommunityCharacterRestController(CommunityCharacterService theCommunityCharacterService)
+    public CommunityCharacterRestController(CommunityCharacterService theCommunityCharacterService, ObjectMapper theObjectMapper)
     {
         communityCharacterService= theCommunityCharacterService;
+        objectMapper= theObjectMapper;
     }
 
     @GetMapping("/communityCharacters")
